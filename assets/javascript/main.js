@@ -17,6 +17,9 @@ let blackJackGame = {
     K: 10,
     A: [1, 11],
   },
+  wins: 0,
+  losses: 0,
+  draws: 0,
 };
 
 const YOU = blackJackGame["you"];
@@ -52,8 +55,6 @@ function showCard(card, player) {
 }
 
 function blackJackDeal() {
-  showResult(blackJackWinner());
-
   let yourImages = document.querySelector("#your-box").querySelectorAll("img");
   let dealerImages = document
     .querySelector("#dealer-box")
@@ -102,6 +103,11 @@ function dealerLogic() {
   showCard(card, DEALER);
   updateScore(card, DEALER);
   showScore(DEALER);
+
+  if (DEALER["score"] > 15) {
+    let winner = blackJackWinner();
+    showResult(winner);
+  }
 }
 
 function blackJackWinner() {
@@ -109,26 +115,22 @@ function blackJackWinner() {
 
   if (YOU["score"] <= 21) {
     if (YOU["score"] > DEALER["score"] || DEALER["score"] > 21) {
-      console.log("You won!");
+      blackJackGame["wins"]++;
       winner = YOU;
-
     } else if (YOU["score"] < DEALER["score"]) {
-      console.log("You lost!");
+      blackJackGame["losses"]++;
       winner = DEALER;
-
     } else if (YOU["score"] === DEALER["score"]) {
-      console.log("Tied!");
+      blackJackGame["draws"]++;
     }
-
   } else if ((YOU["score"] > 21 && DEALER["score"]) <= 21) {
-    console.log("You lost!");
+    blackJackGame["losses"]++;
     winner = DEALER;
-
   } else if ((YOU["score"] > 21 && DEALER["score"]) > 21) {
-    console.log("Tied!");
+    blackJackGame["draws"]++;
   }
 
-  console.log("Winner is", winner);
+  console.log(blackJackGame);
   return winner;
 }
 
@@ -136,16 +138,17 @@ function showResult(winner) {
   let message, messageColor;
 
   if (winner === YOU) {
+    document.querySelector("#wins").textContent = blackJackGame["wins"];
     message = "You won!";
     messageColor = "green";
     winSound.play();
-
   } else if (winner === DEALER) {
+    document.querySelector("#losses").textContent = blackJackGame["losses"];
     message = "You lost!";
     messageColor = "red";
     lossSound.play();
-
   } else {
+    document.querySelector("#draws").textContent = blackJackGame["draws"];
     message = "Tied";
     messageColor = "black";
   }
