@@ -22,8 +22,11 @@ let blackJackGame = {
 const YOU = blackJackGame["you"];
 const DEALER = blackJackGame["dealer"];
 const hitSound = new Audio("assets/sounds/swish.m4a");
+const winSound = new Audio("assets/sounds/cash.mp3");
+const lossSound = new Audio("assets/sounds/aww.mp3");
 
 document.querySelector("#hit-button").addEventListener("click", blackJackHit);
+document.querySelector("#stand-button").addEventListener("click", dealerLogic);
 document.querySelector("#deal-button").addEventListener("click", blackJackDeal);
 
 function blackJackHit() {
@@ -49,6 +52,8 @@ function showCard(card, player) {
 }
 
 function blackJackDeal() {
+  showResult(blackJackWinner());
+
   let yourImages = document.querySelector("#your-box").querySelectorAll("img");
   let dealerImages = document
     .querySelector("#dealer-box")
@@ -90,4 +95,61 @@ function showScore(player) {
     document.querySelector(player["scoreSpan"]).textContent = player["score"];
     document.querySelector(player["scoreSpan"]).style.color = "yellow";
   }
+}
+
+function dealerLogic() {
+  let card = randomCard();
+  showCard(card, DEALER);
+  updateScore(card, DEALER);
+  showScore(DEALER);
+}
+
+function blackJackWinner() {
+  let winner;
+
+  if (YOU["score"] <= 21) {
+    if (YOU["score"] > DEALER["score"] || DEALER["score"] > 21) {
+      console.log("You won!");
+      winner = YOU;
+
+    } else if (YOU["score"] < DEALER["score"]) {
+      console.log("You lost!");
+      winner = DEALER;
+
+    } else if (YOU["score"] === DEALER["score"]) {
+      console.log("Tied!");
+    }
+
+  } else if ((YOU["score"] > 21 && DEALER["score"]) <= 21) {
+    console.log("You lost!");
+    winner = DEALER;
+
+  } else if ((YOU["score"] > 21 && DEALER["score"]) > 21) {
+    console.log("Tied!");
+  }
+
+  console.log("Winner is", winner);
+  return winner;
+}
+
+function showResult(winner) {
+  let message, messageColor;
+
+  if (winner === YOU) {
+    message = "You won!";
+    messageColor = "green";
+    winSound.play();
+
+  } else if (winner === DEALER) {
+    message = "You lost!";
+    messageColor = "red";
+    lossSound.play();
+
+  } else {
+    message = "Tied";
+    messageColor = "black";
+  }
+
+  document.querySelector("#blackjack-status").textContent = message;
+  document.querySelector("#blackjack-status").style.color = messageColor;
 }
